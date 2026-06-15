@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>屈立恒 · 设计作品集</title>
+<style>
+:root{--color-bg:#1a1a1a;--color-bg-light:#f5f0e8;--color-text:#f5f0e8;--color-text-dark:#1a1a1a;--color-accent:#e07a2f;--color-accent-hover:#f08c3e;--color-gray-400:#b8a88a}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:Arial,sans-serif;background:var(--color-bg);color:var(--color-text);overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.container{max-width:1200px;margin:0 auto;padding:0 clamp(1rem,5vw,3rem)}
+section{padding:clamp(5rem,15vh,10rem) 0}
+#particle-canvas{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:99998}
+
+/* Hero Strip */
+.hero-strip-wrap{position:absolute;bottom:0;left:0;width:100%;z-index:5;overflow:hidden}
+.hero-strip{width:100%;overflow:hidden;padding:0.5rem 0 0.8rem 0}
+.strip-track{display:flex;gap:0.8rem;width:max-content;animation:scrollStrip 40s linear infinite}
+.strip-item{flex-shrink:0;width:244px;height:100px;border-radius:6px;position:relative;overflow:hidden;border:1px solid rgba(245,240,232,0.08);transition:transform 0.4s cubic-bezier(0.16,1,0.3,1),box-shadow 0.4s cubic-bezier(0.16,1,0.3,1)}
+.strip-item:hover{transform:translateY(-4px) scale(1.03);box-shadow:0 8px 20px rgba(0,0,0,0.4);border-color:var(--color-accent)}
+.strip-item::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.6) 100%);pointer-events:none}
+@keyframes scrollStrip{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+.hero-strip:hover .strip-track{animation-play-state:paused}
+
+/* Header */
+header{position:fixed;top:0;left:0;width:100%;z-index:1000;padding:1.5rem clamp(1rem,5vw,3rem);display:flex;justify-content:space-between;align-items:center;background:transparent;color:#fff}
+header.scrolled{background:rgba(26,26,26,0.85);backdrop-filter:blur(12px)}
+.logo{font-size:1.25rem;font-weight:700;letter-spacing:-0.02em}
+.logo span{color:var(--color-accent)}
+nav{display:flex;gap:2rem;align-items:center}
+nav a{font-size:0.8rem;text-transform:uppercase;letter-spacing:0.15em;transition:color 0.3s ease;position:relative}
+nav a::after{content:"";position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--color-accent);transition:width 0.3s cubic-bezier(0.16,1,0.3,1)}
+nav a:hover::after{width:100%}
+nav a:hover{color:var(--color-accent)}
+
+/* Hero Section */
+#hero{position:relative;width:100%;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
+#hero .overlay{position:absolute;z-index:1;inset:0;background:linear-gradient(180deg,rgba(26,26,26,0.3) 0%,rgba(26,26,26,0.8) 100%)}
+.hero-content{position:relative;z-index:10;text-align:left;max-width:580px;margin:0 auto;padding:0 clamp(1rem,5vw,3rem)}
+.hero-greeting{font-size:1rem;color:#fff;text-transform:uppercase;letter-spacing:0.2em;margin-bottom:1.5rem;text-shadow:0 2px 8px rgba(0,0,0,0.8);opacity:0.7}
+.hero-title{font-size:clamp(2.5rem,7vw,5rem);font-weight:700;line-height:1.1;color:#fff;text-shadow:0 2px 15px rgba(0,0,0,0.7)}
+.hero-desc{font-size:clamp(0.95rem,1.3vw,1.1rem);color:#fff;margin-top:1rem;line-height:1.7;text-shadow:0 2px 10px rgba(0,0,0,0.8)}
+.hero-cta2{display:inline-block;margin-top:1.8rem;padding:0.8rem 2.5rem;border:1px solid var(--color-accent);background:rgba(224,122,47,0.2);color:#fff;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.15em;transition:all 0.4s cubic-bezier(0.16,1,0.3,1)}
+.hero-cta2:hover{background:var(--color-accent);border-color:var(--color-accent);color:#1a1a1a}
+
+/* About Section (浅色背景) */
+#about{background:var(--color-bg-light);color:var(--color-text-dark)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:8rem;align-items:start}
+.about-text p{font-size:clamp(1rem,1.5vw,1.25rem);line-height:1.8;color:rgba(26,26,26,0.75);margin-bottom:1.5rem}
+.about-stats{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+.stat-item{border-top:1px solid rgba(26,26,26,0.1);padding-top:1.5rem}
+.stat-item .num{font-size:clamp(2.5rem,5vw,4rem);font-weight:700;line-height:1}
+.stat-item .num .accent{color:var(--color-accent)}
+.stat-item .label{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--color-gray-400);margin-top:0.5rem;display:block}
+
+/* Work Section (深色背景) */
+#work{background:var(--color-bg);color:var(--color-text)}
+.section-label{font-size:0.9rem;text-transform:uppercase;letter-spacing:0.2em;color:var(--color-gray-400);margin-bottom:0.5rem}
+#work h2,#about h2,#contact h2{font-size:clamp(2rem,5vw,4rem);font-weight:700;margin-bottom:4rem}
+.work-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(1.5rem,2.5vw,2.5rem)}
+.work-card{background:transparent;border:1px solid rgba(245,240,232,0.15);padding:0;border-radius:10px;position:relative;transition:all 0.4s cubic-bezier(0.16,1,0.3,1);display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1/1;background-size:cover;background-position:center;overflow:hidden;cursor:pointer}
+.work-card::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.45) 100%);z-index:1;pointer-events:none;border-radius:10px}
+.work-card-wrap .card-info{margin-top:0.8rem}
+.work-card-wrap .card-info p{font-size:0.8rem;line-height:1.5;color:#6b6b6b}
+.card-label{display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.6rem}
+.card-label .card-num{color:var(--color-accent);font-size:1.1rem;font-weight:700;letter-spacing:0.05em;line-height:1}
+.card-label .card-name{font-size:1.1rem;font-weight:600;color:var(--color-text);line-height:1}
+.work-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,0.3);animation:neonGlow 1.5s linear infinite}
+@keyframes neonGlow{0%,100%{box-shadow:0 0 6px #e07a2f,0 0 12px #e07a2f,0 0 20px rgba(224,122,47,0.3),0 12px 30px rgba(0,0,0,0.3)}50%{box-shadow:0 0 10px #e07a2f,0 0 24px #e07a2f,0 0 40px rgba(224,122,47,0.5),0 12px 30px rgba(0,0,0,0.3)}}
+
+/* Contact Section */
+#contact{background:var(--color-bg-light);color:var(--color-text-dark)}
+.contact-content{display:flex;gap:4rem;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+.contact-left{flex:1;min-width:280px}
+.contact-phone{display:block;font-size:clamp(2rem,5vw,4.5rem);font-weight:700;letter-spacing:-0.02em;color:var(--color-text-dark);transition:all 0.3s ease;margin-bottom:1rem}
+.contact-phone:hover{color:var(--color-accent);transform:scale(1.04)}
+.contact-desc{font-size:1rem;color:#b8a88a;line-height:1.6;text-align:left}
+.contact-links{display:block;margin-bottom:1rem}
+.contact-link{font-size:1rem;text-transform:uppercase;letter-spacing:0.15em;padding:0;border-radius:0;transition:all 0.3s ease;display:inline-block}
+.contact-link:hover{color:var(--color-accent);transform:scale(1.08)}
+.contact-right{flex:0 0 auto;display:flex;align-items:flex-end}
+.contact-qr{display:flex;flex-direction:column;align-items:center;gap:0.5rem;justify-content:flex-end}
+.contact-qr img{width:300px;height:300px;border-radius:12px;object-fit:cover;border:2px solid rgba(0,0,0,0.06);transition:all 0.3s;cursor:pointer}
+.contact-qr img:hover{transform:scale(1.08)}
+.contact-qr-label{font-size:0.8rem;color:#b8a88a;letter-spacing:0.05em}
+
+/* Footer */
+footer{padding:2.5rem 0;background:var(--color-bg);text-align:center}
+footer p{font-size:0.8rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--color-gray-400)}
+.footer-content{display:flex;justify-content:center;align-items:center;gap:1.5rem;flex-wrap:wrap}
+.footer-links{display:flex;align-items:center;gap:0.8rem}
+.footer-links a{font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-gray-400);transition:color 0.3s}
+.footer-links a:hover{color:var(--color-accent)}
+.footer-divider{color:rgba(245,240,232,0.2);font-size:0.8rem}
+
+/* Reveal Animation */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 0.8s cubic-bezier(0.16,1,0.3,1),transform 0.8s cubic-bezier(0.16,1,0.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* Lightbox */
+.lightbox{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:99999;justify-content:center;align-items:center}
+.lightbox.show{display:flex}
+.lightbox-img-wrap{width:90vw;height:85vh;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;cursor:grab;margin:0;padding-top:0}
+.lightbox-img-wrap img{display:block;width:auto;height:auto;max-width:100%;border-radius:4px;transform-origin:center center;transition:transform 0.15s ease}
+.lightbox .close-lightbox{position:fixed;top:20px;right:30px;color:#fff;font-size:2.5rem;cursor:pointer;z-index:10;width:50px;height:50px;display:flex;align-items:center;justify-content:center}
+.lb-controls{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;z-index:100000;background:rgba(0,0,0,0.6);padding:8px 16px;border-radius:25px;backdrop-filter:blur(8px)}
+.lb-btn{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);background:transparent;color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;user-select:none}
+.lb-btn:hover{background:var(--color-accent);border-color:var(--color-accent)}
+.lb-zoom-pct{color:#fff;font-size:0.8rem;min-width:45px;text-align:center;letter-spacing:0.05em}
+
+/* Video Picker */
+.video-picker{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:99999;justify-content:center;align-items:center}
+.video-picker.show{display:flex}
+.video-picker-content{background:#2a2a2a;border-radius:16px;padding:2rem;max-width:480px;width:90%;max-height:80vh;overflow-y:auto}
+.video-picker-title{color:#fff;font-size:1.2rem;font-weight:600;margin-bottom:1.5rem;text-align:center;letter-spacing:0.05em}
+.video-list{display:flex;flex-direction:column;gap:0.8rem}
+.video-item{display:flex;align-items:center;gap:1rem;padding:0.8rem 1rem;background:rgba(255,255,255,0.05);border-radius:10px;cursor:pointer;transition:all 0.3s}
+.video-item:hover{background:var(--color-accent);transform:translateX(4px)}
+.video-thumb{width:48px;height:48px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#1a1a1a}
+.video-play-icon{color:rgba(255,255,255,0.7);font-size:1.2rem}
+.video-item:hover .video-play-icon{color:#fff}
+.video-name{color:#fff;font-size:0.95rem;font-weight:500}
+
+/* Video Player */
+.video-player{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.95);z-index:100000;justify-content:center;align-items:center}
+.video-player.show{display:flex}
+.video-player-content{width:80%;max-width:900px}
+
+/* Responsive */
+
+/* Experience / 工作经历 */
+.about-experience h3{font-size:1rem;font-weight:700;color:var(--color-text-dark);margin-bottom:1.5rem;letter-spacing:0.05em}
+.exp-list{display:flex;flex-direction:column;gap:1.5rem}
+.exp-item{border-left:2px solid var(--color-accent);padding-left:0.8rem}
+.exp-item .exp-date{font-size:0.68rem;color:var(--color-accent);font-weight:600;text-transform:uppercase;letter-spacing:0.03em;margin-bottom:0.15rem}
+.exp-item .exp-company{font-size:0.82rem;font-weight:700;color:var(--color-text-dark);margin-bottom:0.05rem}
+.exp-item .exp-role{font-size:0.72rem;color:var(--color-accent);font-weight:600;margin-bottom:0.2rem}
+.exp-item .exp-desc{font-size:0.7rem;line-height:1.45;color:rgba(26,26,26,0.6)}
+#about .section-label{margin-bottom:0.3rem}
+
+
+.contact-email{display:block;font-size:clamp(1rem,2.5vw,2.25rem);font-weight:700;letter-spacing:-0.02em;color:var(--color-text-dark);margin-top:0.8rem;margin-bottom:1.5rem;transition:all 0.3s ease}
+.contact-email:hover{color:var(--color-accent);letter-spacing:0}
+
+@media(max-width:768px){
+  nav{gap:1rem}nav a{font-size:0.65rem}
+  .work-grid{grid-template-columns:repeat(2,1fr)}
+  .about-grid{grid-template-columns:1fr;gap:2rem}
+  .about-stats{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+  header{padding:1rem}
+  .work-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body><canvas id="particle-canvas"></canvas>
+
+<header id="header">
+  <div class="logo">屈立恒<span>.</span></div>
+  <nav>
+    <a href="#hero">首页</a>
+    <a href="#about">关于</a>
+    <a href="#work">作品</a>
+    <a href="#contact">联系</a>
+  </nav>
+</header>
+
+<section id="hero">
+  <div id="hero-bg" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;">
+    <video id="hero-video" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;">
+      <source src="首屏动画/天空中的星球缓慢转动.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="overlay"></div>
+  <div class="hero-content">
+    <p class="hero-greeting">✦ 简约 · 温度 · 独特</p>
+    <div style="display:flex;align-items:baseline;gap:1.5rem;flex-wrap:wrap">
+      <p class="hero-title" style="font-size:clamp(2.5rem,7vw,5rem);font-weight:700;color:#fff;text-shadow:0 2px 15px rgba(0,0,0,0.7);margin:0;line-height:1.1;letter-spacing:-0.02em">屈立恒</p>
+      <h1 class="hero-title" style="font-size:clamp(1.6rem,3vw,2.2rem);font-weight:300;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,0.8);margin:0;letter-spacing:0.05em;opacity:0.85">视觉设计师</h1>
+    </div>
+    <p class="hero-desc">让AI赋能电商品牌视觉设计。</p>
+    <p class="hero-desc" style="margin-top:0.4rem">技术放大创意，<span style="color:var(--color-accent)">人性洞察才是破圈的内核</span>。</p>
+    <a href="#work" class="hero-cta2">查看作品</a>
+  </div>
+  <div class="hero-strip-wrap">
+    <div class="hero-strip">
+      <div class="strip-track">      <div class="strip-item" style="background-image:url(滑动条图片/1.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/2.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/3.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/4.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/5.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/6.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/7.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/8.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/9.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/10.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/11.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/12.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/13.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/14.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/15.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/16.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/17.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/18.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/19.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/20.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/21.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/22.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/23.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      <div class="strip-item" style="background-image:url(滑动条图片/24.jpg);background-size:cover;background-position:center"><span class="strip-label"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="container">
+    <p class="section-label reveal">关于我</p>
+    <h2 class="reveal" style="color:var(--color-accent)">设计<span style="color:var(--color-text-dark)">理念</span></h2>
+    <div class="about-grid">
+      <!-- Left: Design Philosophy + Stats -->
+      <div>
+        <div class="about-text reveal">
+          <p style="line-height:2">我认为，好的设计需要理性与感性的平衡。<br><br>在AI时代，我不排斥技术，而是将其作为连接的桥梁。如今，AI已深度融入我的工作流。<br><br>它帮助我跳出思维定势，快速搭建视觉雏形；而我则负责算法之外的"人性"——洞察需求、定义风格、注入情感。</p>
+          <p>用AI增效，用设计动心。在AI的协助下，让每一件作品都清晰、高效，且独一无二。</p>
+        </div>
+        <div class="about-stats reveal" style="display:flex;flex-direction:row;gap:3rem;margin-top:3rem;justify-content:space-between">
+          <div class="stat-item" style="border-top:none;padding-top:0"><div class="num"><span class="accent">8</span>+</div><span class="label">年设计经验</span></div>
+          <div class="stat-item" style="border-top:none;padding-top:0"><div class="num"><span class="accent">120</span>+</div><span class="label">完成项目</span></div>
+          <div class="stat-item" style="border-top:none;padding-top:0"><div class="num"><span class="accent">100</span>%</div><span class="label">满意度</span></div>
+          <div class="stat-item" style="border-top:none;padding-top:0"><div class="num"><span class="accent">5</span>+</div><span class="label">覆盖行业/领域</span></div>
+        </div>
+      </div>
+      <!-- Right: Work Experience -->
+      <div class="about-experience reveal">
+        <h3>工作经历概览</h3>
+        <div class="exp-list">
+          <div class="exp-item">
+            <div class="exp-date">2020.10 — 2022.07</div>
+            <div class="exp-company">深圳市英波教育科技有限公司</div>
+            <div class="exp-role">平面设计</div>
+            <div class="exp-desc">品牌视觉设计、宣传物料（海报/宣传册/广告图/社交媒体配图）</div>
+          </div>
+          <div class="exp-item">
+            <div class="exp-date">2022.08 — 2023.05</div>
+            <div class="exp-company">迷时空科技有限公司</div>
+            <div class="exp-role">渲染设计师</div>
+            <div class="exp-desc">产品模型优化、电商主图/详情页渲染、产品动画全流程制作</div>
+          </div>
+          <div class="exp-item">
+            <div class="exp-date">2023.06 — 2025.06</div>
+            <div class="exp-company">深圳市环球易达供应链管理有限公司</div>
+            <div class="exp-role">视觉设计师</div>
+            <div class="exp-desc">品牌形象维护、主图/A+设计、包装方案、产品动画、营销视觉支持</div>
+          </div>
+          <div class="exp-item">
+            <div class="exp-date">2025.08 — 2026.07</div>
+            <div class="exp-company">深圳顺为智达科技有限公司</div>
+            <div class="exp-role">平面设计师</div>
+            <div class="exp-desc">亚马逊主图/A+/旗舰店设计、独立站视觉搭建、品牌规范制定</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="container">
+    <p class="section-label reveal">代表项目</p>
+    <h2 class="reveal" style="color:var(--color-accent)">精选作品</h2>
+    <div class="work-grid">
+      <div class="work-card-wrap reveal">
+        <div class="card-label"><span class="card-num">01</span><span class="card-name">游戏手柄</span></div>
+        <div class="work-card" style="background-image:url(板块二图片/矩形封面/1.jpg);background-size:cover;background-position:center" onclick="openLightbox('板块二图片/矩形长图/1.jpg')"></div>
+        <div class="card-info"><p>手柄的握持弧度、键位排布与材质质感，建立人与机器的亲密连接</p></div>
+      </div>
+      <div class="work-card-wrap reveal">
+        <div class="card-label"><span class="card-num">02</span><span class="card-name">氛围灯产品精选</span></div>
+        <div class="work-card" style="background-image:url(板块二图片/矩形封面/2.jpg);background-size:cover;background-position:center" onclick="openLightbox('板块二图片/矩形长图/2.jpg')"></div>
+        <div class="card-info"><p>光影与空间的对话，用柔和光线营造富有情感层次的居住体验</p></div>
+      </div>
+      <div class="work-card-wrap reveal">
+        <div class="card-label"><span class="card-num">03</span><span class="card-name">运动/健康产品精选</span></div>
+        <div class="work-card" style="background-image:url(板块二图片/矩形封面/3.jpg);background-size:cover;background-position:center" onclick="openLightbox('板块二图片/矩形长图/3.jpg')"></div>
+        <div class="card-info"><p>科技感与人体工学的平衡，让运动装备成为生活方式的延伸</p></div>
+      </div>
+      <div class="work-card-wrap reveal">
+        <div class="card-label"><span class="card-num">04</span><span class="card-name">泳池系列产品精选</span></div>
+        <div class="work-card" style="background-image:url(板块二图片/矩形封面/4.jpg);background-size:cover;background-position:center" onclick="openLightbox('板块二图片/矩形长图/4.jpg')"></div>
+        <div class="card-info"><p>水与光的流动美学，泳池设备的极简设计与户外环境的融合</p></div>
+      </div>
+      <div class="work-card-wrap reveal">
+        <div class="card-label"><span class="card-num">05</span><span class="card-name">亚马逊站点品牌设计</span></div>
+        <div class="work-card" style="background-image:url(板块二图片/矩形封面/5.jpg);background-size:cover;background-position:center" onclick="openLightbox('板块二图片/矩形长图/5.jpg')"></div>
+        <div class="card-info"><p>从产品主图到品牌故事旗舰店，打造沉浸式电商购物体验</p></div>
+      </div>
+      <div class="work-card-wrap reveal">
+        <div class="card-label"><span class="card-num">06</span><span class="card-name">产品动画</span></div>
+        <div class="work-card" style="background-image:url(板块二图片/矩形封面/6.jpg);background-size:cover;background-position:center" onclick="openVideoPicker()"></div>
+        <div class="card-info"><p>通过动态叙事展现产品核心卖点，让静止的设计在影像中「活」起来</p></div>
+      </div>
+    </div>
+  </div>
+</section><section id="contact">
+  <div class="container">
+    <p class="section-label reveal">联系我</p>
+    <h2 class="reveal"><span style="color:var(--color-text-dark)">一起</span><span style="color:var(--color-accent)">合作</span></h2>
+    <div class="contact-content reveal">
+      <div class="contact-left">
+        <a href="tel:13551022789" class="contact-phone"><span style="color:var(--color-accent)">135</span>-5102-<span style="color:var(--color-accent)">2789</span></a>
+          <a href="mailto:959218200@qq.com" class="contact-email"><span style="color:var(--color-accent)">959218200</span>@qq.com</a>
+        <div class="contact-links">
+          <a href="https://www.zcool.com.cn/u/25245629" target="_blank" rel="noopener noreferrer" class="contact-link">站酷 (Zcool) — https://www.zcool.com.cn/u/25245629</a>
+        </div>
+        <p class="contact-desc">欢迎致电或微信联系，共创美好的未来</p>
+      </div>
+      <div class="contact-right">
+        <div class="contact-qr">
+          <img src="底部栏内容/二维码_cropped.png" alt="微信二维码">
+          <span class="contact-qr-label">微信扫码联系</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-content">
+      <p class="footer-copy">&copy; 2026 屈立恒 · 设计作品集</p>
+      <div class="footer-links">
+        <a href="https://www.zcool.com.cn/u/25245629" target="_blank" rel="noopener noreferrer">站酷 (Zcool)</a>
+        <span class="footer-divider">|</span>
+        <a href="tel:13551022789">135-5102-2789</a>
+      </div>
+    </div>
+  </div>
+</footer><script>
+(function(){
+  var observer = new IntersectionObserver(function(e) {
+    e.forEach(function(ee) { if(ee.isIntersecting) ee.target.classList.add("visible"); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll(".reveal").forEach(function(el) { observer.observe(el); });
+})();
+</script>
+
+<script>
+var lbZoom = 0.5;
+
+
+function openLightbox(src) {
+  document.getElementById("lightbox").classList.add("show");
+  document.getElementById("lightbox-img").src = src;
+  lbZoom = 0.5;
+  document.getElementById("lightbox-img").style.transform = "scale(0.5)";
+  document.getElementById("lb-pct").textContent = "50%";
+  var wrap = document.getElementById("lb-wrap");
+  var img = document.getElementById("lightbox-img");
+  if (wrap) { wrap.scrollTop = 0; }
+  if (img) {
+    img.onload = function () {
+      if (wrap) setTimeout(function () { wrap.scrollTop = 0; }, 100);
+    };
+  }
+}
+
+function closeLightbox(){
+  document.getElementById("lightbox").classList.remove("show");
+}
+document.getElementById("lightbox").onclick = function(e){
+  if(e.target === this || e.target === this.querySelector(".lightbox-img-wrap")){
+    closeLightbox();
+  }
+};
+document.getElementById("lb-zoom-in").onclick = function(e){
+  lbZoom = Math.min(5, lbZoom + 0.1);
+  document.getElementById("lightbox-img").style.transform = "scale(" + lbZoom + ")";
+  document.getElementById("lb-pct").textContent = Math.round(lbZoom * 100) + "%";
+  return false;
+};
+document.getElementById("lb-zoom-out").onclick = function(e){
+  lbZoom = Math.max(0.3, lbZoom - 0.1);
+  document.getElementById("lightbox-img").style.transform = "scale(" + lbZoom + ")";
+  document.getElementById("lb-pct").textContent = Math.round(lbZoom * 100) + "%";
+  return false;
+};
+document.getElementById("lb-wrap").onwheel = function(e){
+  this.scrollTop += e.deltaY;
+};
+(function(){
+  var isDragging = false, startX, startY, scrollLeft, scrollTop, dragTimer;
+  document.addEventListener("mousedown", function(e){
+    var img = document.getElementById("lightbox-img");
+    if(e.target !== img) return;
+    var lb = document.getElementById("lightbox");
+    if(!lb.classList.contains("show")) return;
+    dragTimer = setTimeout(function(){
+      isDragging = true;
+      img.style.cursor = "grabbing";
+      startX = e.clientX; startY = e.clientY;
+      var wrap = document.getElementById("lb-wrap");
+      scrollLeft = wrap.scrollLeft; scrollTop = wrap.scrollTop;
+    }, 150);
+  });
+  document.addEventListener("mousemove", function(e){
+    if(!isDragging) return;
+    e.preventDefault();
+    var wrap = document.getElementById("lb-wrap");
+    wrap.scrollLeft = scrollLeft - (e.clientX - startX);
+    wrap.scrollTop = scrollTop - (e.clientY - startY);
+  });
+  document.addEventListener("mouseup", function(e){
+    clearTimeout(dragTimer);
+    if(isDragging){
+      isDragging = false;
+      var img = document.getElementById("lightbox-img");
+      if(img) img.style.cursor = "grab";
+      e.preventDefault();
+    }
+  });
+})();
+
+function openVideoPicker(){
+  document.getElementById("video-picker").classList.add("show");
+}
+function closeVideoPicker(){
+  document.getElementById("video-picker").classList.remove("show");
+}
+function openVideoPlayer(src){
+  closeVideoPicker();
+  document.getElementById("video-player").classList.add("show");
+  var vid = document.getElementById("main-video");
+  vid.src = src;
+  vid.play();
+}
+function closeVideoPlayerOverlay(){
+  var vid = document.getElementById("main-video");
+  vid.pause();
+  vid.src = "";
+  document.getElementById("video-player").classList.remove("show");
+}
+</script>
+
+<script>
+try{(function(){
+  var c = document.getElementById("particle-canvas");
+  if(!c) return;
+  var cx = c.getContext("2d");
+  var W, H;
+  function rs(){ W = window.innerWidth; H = window.innerHeight; c.width = W; c.height = H; }
+  rs(); window.addEventListener("resize", rs);
+  var hue = 0, particles = [], mx = W/2, my = H/2;
+  document.addEventListener("mousemove", function(e){
+    mx = e.clientX; my = e.clientY;
+    hue = (hue + 0.8) % 360;
+    for(var i = 0; i < 3; i++){
+      var baseHue = (hue + i * 20) % 360;
+      particles.push({
+        x: mx + (Math.random() - 0.5) * 4,
+        y: my + (Math.random() - 0.5) * 4,
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.5) * 2,
+        life: 1,
+        size: Math.random() * 6 + 3,
+        hue: baseHue
+      });
+    }
+    if(particles.length > 120) particles.splice(0, particles.length - 120);
+  });
+  function draw(){
+    cx.clearRect(0, 0, W, H);
+    for(var i = particles.length - 1; i >= 0; i--){
+      var p = particles[i];
+      p.x += p.vx; p.y += p.vy;
+      p.vx *= 0.98; p.vy *= 0.98;
+      p.life -= 0.015; p.size *= 0.995;
+      if(p.life <= 0 || p.size < 0.3){ particles.splice(i, 1); continue; }
+      var alpha = p.life * 0.7;
+      var glow = p.life * 0.3;
+      cx.save(); cx.globalAlpha = glow * 0.15;
+      cx.shadowColor = "hsl(" + p.hue + ",100%,65%)"; cx.shadowBlur = 30;
+      cx.beginPath(); cx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
+      cx.fillStyle = "hsl(" + p.hue + ",100%,65%)"; cx.fill(); cx.restore();
+      cx.save(); cx.globalAlpha = alpha;
+      cx.shadowColor = "hsl(" + p.hue + ",100%,70%)"; cx.shadowBlur = 15;
+      cx.beginPath(); cx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      cx.fillStyle = "hsl(" + p.hue + ",100%,75%)"; cx.fill(); cx.restore();
+      cx.save(); cx.globalAlpha = alpha * 0.3;
+      cx.shadowColor = "hsl(" + p.hue + ",100%,60%)"; cx.shadowBlur = 20;
+      cx.beginPath(); cx.moveTo(p.x, p.y);
+      cx.lineTo(p.x - p.vx * 8, p.y - p.vy * 8);
+      cx.strokeStyle = "hsla(" + p.hue + ",100%,70%," + alpha * 0.5 + ")";
+      cx.lineWidth = p.size * 0.6; cx.lineCap = "round"; cx.stroke(); cx.restore();
+    }
+    cx.globalAlpha = 1; requestAnimationFrame(draw);
+  }
+  draw();
+})();}catch(e){console.error(e)}
+</script>
+
+<div class="lightbox" id="lightbox">
+  <span class="close-lightbox" onclick="closeLightbox()">&times;</span>
+  <div class="lightbox-img-wrap" id="lb-wrap">
+    <img id="lightbox-img" src="" alt="放大展示">
+  </div>
+  <div class="lb-controls">
+    <button class="lb-btn" id="lb-zoom-out" title="缩小">−</button>
+    <span class="lb-zoom-pct" id="lb-pct">50%</span>
+    <button class="lb-btn" id="lb-zoom-in" title="放大">+</button>
+  </div>
+</div>
+
+<div class="video-picker" id="video-picker" onclick="closeVideoPicker()">
+  <span class="close-lightbox" onclick="closeVideoPicker()">&times;</span>
+  <div class="video-picker-content" onclick="event.stopPropagation()">
+    <h3 class="video-picker-title">选择动画产品</h3>
+    <div class="video-list">
+      <div class="video-item" onclick="openVideoPlayer('板块二图片/视频/180桌面氛围灯-英文版.mp4')">
+        <div class="video-thumb" style="background:#1a1a1a"><span class="video-play-icon">▶</span></div>
+        <span class="video-name">180桌面氛围灯</span>
+      </div>
+      <div class="video-item" onclick="openVideoPlayer('板块二图片/视频/L型四节氛围灯-英文版.mp4')">
+        <div class="video-thumb" style="background:#1a1a1a"><span class="video-play-icon">▶</span></div>
+        <span class="video-name">L型四节氛围灯</span>
+      </div>
+      <div class="video-item" onclick="openVideoPlayer('板块二图片/视频/TV取色灯-PR.mp4')">
+        <div class="video-thumb" style="background:#1a1a1a"><span class="video-play-icon">▶</span></div>
+        <span class="video-name">TV取色灯</span>
+      </div>
+      <div class="video-item" onclick="openVideoPlayer('板块二图片/视频/HAUTE42定制视频.mp4')">
+        <div class="video-thumb" style="background:#1a1a1a"><span class="video-play-icon">▶</span></div>
+        <span class="video-name">HAUTE42定制视频</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="video-player" id="video-player" onclick="closeVideoPlayerOverlay()">
+  <span class="close-lightbox" onclick="closeVideoPlayerOverlay()">&times;</span>
+  <div class="video-player-content" onclick="event.stopPropagation()">
+    <video id="main-video" controls autoplay style="width:100%;max-height:80vh;border-radius:8px"></video>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,8 @@
+# 忽略系统文件
+Thumbs.db
+.DS_Store
+*.log
+
+# 大视频文件（超过GitHub 100MB限制）
+板块二图片/视频/*.mp4
+首屏动画/*.mp4
