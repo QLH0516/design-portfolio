@@ -3,6 +3,6 @@ Thumbs.db
 .DS_Store
 *.log
 
-# 大视频文件（超过GitHub 100MB限制）
-板块二图片/视频/*.mp4
-首屏动画/*.mp4
+# 原始大视频文件（保留本地备份，不上传）
+板块二图片/视频/*_original.mp4
+首屏动画/*_original.mp4
